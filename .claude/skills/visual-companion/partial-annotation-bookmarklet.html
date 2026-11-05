@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>局部标注 · 书签工具</title>
+<style>
+  body { font-family: -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif; background:#f8fafc; color:#1e293b; line-height:1.7; max-width:720px; margin:40px auto; padding:0 24px; }
+  h1 { font-size:24px; }
+  .bookmark { display:inline-block; background:#2563eb; color:#fff; padding:14px 28px; border-radius:8px; text-decoration:none; font-weight:600; font-size:16px; margin:20px 0; box-shadow:0 4px 12px rgba(37,99,235,0.3); }
+  .bookmark:hover { background:#1d4ed8; }
+  .step { background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:16px 20px; margin:12px 0; }
+  .step b { color:#2563eb; }
+  pre { background:#0f172a; color:#e2e8f0; padding:14px; border-radius:6px; font-size:12px; overflow-x:auto; }
+  .note { color:#64748b; font-size:13px; }
+  .copy-btn { margin-top:10px; padding:8px 16px; background:#fff; color:#2563eb; border:1px solid #2563eb; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; }
+  .copy-btn:hover { background:#eff6ff; }
+</style>
+</head>
+<body>
+
+<h1>📐 局部标注 · 书签工具</h1>
+<p>独立的 HTML 局部标注工具。不修改 HTML 源文件，运行时注入。选中元素 → 写改动 → 导出清单给 AI。</p>
+
+<div class="step" style="background:#ecfdf5;border-color:#a7f3d0;">
+  <b>🌐 推荐用 Chrome（谷歌浏览器）</b>预览原型和标注——书签法在 Chrome 上<b>一拖即装、点即用</b>，体验最好、最省心。<b>Edge 上书签受限</b>（新建/编辑收藏都会被吃掉 <code>javascript:</code> 前缀），只能用第 1 步 <b>②控制台法</b>（每次开 F12 粘一下）。所以标注任意网页，直接用 Chrome 最顺。
+</div>
+
+<div class="step" style="background:#fffbeb;border-color:#fde68a;">
+  <b>💡 先看这里</b>：如果你标注的是 <b>visual-companion 生成的可视化 HTML</b>，<b>无需本工具</b>——那些 HTML 已<b>自带标注器</b>，打开后右下角就有 📐 浮动按钮，点开即用（Edge/Chrome/Firefox 都行，零安装）。<br>
+  本页的<b>书签版</b>仅作为<b>兜底</b>，用于标注<b>非 本流程生成的任意网页</b>（比如线上页面、别处找来的 HTML）。
+</div>
+
+<div class="step">
+  <b>第 1 步</b>：选一种方式安装/触发（<b>Edge 用户强烈建议用 ② 控制台法</b>）：
+  <br><br>
+  <a id="bookmark-link" class="bookmark" href="#">📥 局部标注</a>
+  <br>
+  <button id="copy-code" class="copy-btn" type="button">📋 复制书签代码（javascript:）</button>
+  <button id="copy-console" class="copy-btn" type="button" style="margin-left:8px;">📋 复制控制台源码（Edge 推荐）</button>
+
+  <p class="note"><b>① Chrome / 能正常拖拽的浏览器</b>：直接把上面蓝色按钮<b>拖到收藏栏</b>即可，一步到位。</p>
+
+  <p class="note"><b>② Edge · 控制台法（最稳，推荐）</b>：点「复制控制台源码」→ 打开任意要标注的网页 → 按 <b>F12</b> → 切到 <b>Console</b> 标签 → <b>Ctrl+V 粘贴</b> → 按 <b>回车</b>。标注器立即在该页生效。<b>不经过书签，绕开 Edge 所有限制</b>。每次开 F12 粘一下即可。</p>
+
+  <p class="note"><b>③ Edge · 书签法（实测新版 Edge 常失效，不推荐）</b>：理论上可"先收藏一个正常网页 → Ctrl+Shift+O 编辑其 URL → 替换为书签代码"，但<b>新版 Edge 编辑时也可能剥离 <code>javascript:</code> 前缀、且长 URL 易被截断</b>，存成的书签多数点不动。<b>Edge 用户请直接用 ②控制台法</b>，或更省心地<b>改用 Chrome</b>（书签法①一拖即装）。</p>
+</div>
+
+<div class="step">
+  <b>第 2 步</b>：打开要标注的网页（任意网页均可，不限可视化 HTML）。
+</div>
+
+<div class="step">
+  <b>第 3 步</b>：触发标注器——<b>书签用户</b>点收藏栏的「📥 局部标注」；<b>控制台用户</b>已在上一步 F12 粘贴执行。页面顶部出现标注工具栏即成功。
+</div>
+
+<div class="step">
+  <b>第 4 步</b>：点「开启标注」→ 鼠标悬浮高亮元素（F12 式）→ 点击选中 → 写改动 → 确认。可标多个。
+</div>
+
+<div class="step">
+  <b>第 5 步</b>：点「导出清单」→ 复制 → 贴给 AI。AI 按 selector 在源 HTML 里定位元素、按改动描述修改。
+</div>
+
+<h3>导出的清单长这样：</h3>
+<pre>1. .cal-grid .cal-event:nth-child(2) | &lt;div class="cal-event"&gt;10:30 家长会&lt;/div&gt; | 颜色改浅
+2. .mock-btn | &lt;span class="mock-btn"&gt;新建日程&lt;/span&gt; | 文字改成"立即创建"
+3. .cal-head:nth-child(3) | &lt;div class="cal-head"&gt;周三 17&lt;/div&gt; | 背景改成黄色</pre>
+
+<p class="note">每条 = CSS selector（AI 按此定位元素）+ 元素签名（实况）+ 改动描述。AI 拿到后直接按 selector 改源 HTML，不用猜。</p>
+
+<!-- ===== 标注器脚本（作为文本，动态编码成 bookmarklet）===== -->
+<script id="annotator-src" type="text/plain">
+(function(){
+  if(document.getElementById('sk-toolbar')){alert('标注器已开启');return;}
+  var s=document.createElement('style');
+  s.textContent='#sk-toolbar{position:fixed;top:0;left:0;right:0;height:48px;z-index:999999;background:#fff;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:10px;padding:0 16px;box-shadow:0 1px 3px rgba(0,0,0,.1);font-family:-apple-system,"Segoe UI","Microsoft YaHei",sans-serif}#sk-toolbar .t{font-weight:600;font-size:14px}#sk-toolbar button{padding:5px 12px;border:1px solid #e2e8f0;background:#fff;border-radius:5px;cursor:pointer;font-size:12px;color:#1e293b;font-family:inherit}#sk-toolbar button:hover{border-color:#2563eb;color:#2563eb}#sk-toolbar button.active{background:#f59e0b;color:#fff;border-color:#f59e0b}#sk-toolbar .c{margin-left:auto;color:#64748b;font-size:12px}#sk-toolbar .h{color:#94a3b8;font-size:11px}body.sk-ann *{cursor:crosshair!important}.sk-h{outline:2px solid #2563eb!important;outline-offset:2px;background:rgba(37,99,235,.08)!important}.sk-d{outline:2px dashed #f59e0b!important;outline-offset:2px}#sk-lb{position:fixed;z-index:1000000;pointer-events:none;background:#2563eb;color:#fff;padding:3px 8px;border-radius:4px;font-size:11px;font-family:Consolas,monospace;display:none;max-width:400px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sk-bg{position:absolute;width:18px;height:18px;border-radius:50%;background:#f59e0b;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;top:-9px;right:-9px;z-index:1000001;pointer-events:none}#sk-op{position:fixed;z-index:1000001;background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:12px;width:300px;display:none;box-shadow:0 8px 24px rgba(0,0,0,.15);font-family:inherit}#sk-op .ot{font-size:11px;color:#64748b;margin-bottom:6px;word-break:break-all}#sk-op .os{font-size:10px;color:#94a3b8;font-family:Consolas,monospace;margin-bottom:6px;word-break:break-all;background:#f8fafc;padding:4px 6px;border-radius:3px}#sk-op textarea{width:100%;height:56px;border:1px solid #e2e8f0;border-radius:4px;padding:6px;font-size:12px;resize:none;font-family:inherit}#sk-op .ob{display:flex;gap:8px;margin-top:8px;justify-content:flex-end}#sk-op button{padding:4px 12px;border:1px solid #e2e8f0;background:#fff;border-radius:4px;cursor:pointer;font-size:11px;font-family:inherit}#sk-op button.ok{background:#2563eb;color:#fff;border-color:#2563eb}#sk-ex{position:fixed;bottom:16px;right:16px;width:420px;max-height:55vh;background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:14px;z-index:999998;display:none;box-shadow:0 8px 24px rgba(0,0,0,.12);overflow:auto;font-family:inherit}#sk-ex h3{font-size:13px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}#sk-ex h3 button{font-size:11px;padding:2px 8px;border:1px solid #e2e8f0;background:#fff;border-radius:4px;cursor:pointer;font-family:inherit}#sk-ex pre{background:#f8fafc;padding:10px;border-radius:4px;font-size:11px;white-space:pre-wrap;word-break:break-all;font-family:Consolas,monospace}';
+  document.head.appendChild(s);
+  var tb=document.createElement('div');tb.id='sk-toolbar';tb.innerHTML='<span class="t">📐 标注</span><button id="sk-tg">开启标注</button><button id="sk-exb">导出清单</button><button id="sk-cl">清空</button><span class="h">悬浮高亮元素→点击→写改动</span><span class="c" id="sk-ct">已标 0</span>';
+  document.body.appendChild(tb);
+  var lb=document.createElement('div');lb.id='sk-lb';document.body.appendChild(lb);
+  var op=document.createElement('div');op.id='sk-op';op.innerHTML='<div class="ot" id="sk-ot"></div><div class="os" id="sk-os"></div><textarea id="sk-oi" placeholder="改动描述，如：颜色改浅、文字改成XX、删掉…"></textarea><div class="ob"><button id="sk-oc">取消</button><button class="ok" id="sk-ok">确认</button></div>';
+  document.body.appendChild(op);
+  var ex=document.createElement('div');ex.id='sk-ex';ex.innerHTML='<h3>改动清单（复制贴给 AI）<button id="sk-cp">复制</button></h3><pre id="sk-ep"></pre>';
+  document.body.appendChild(ex);
+  var mode=false,hv=null,pe=null,ans=[],bg=0;
+  var isT=function(e){return !e||e.closest('#sk-toolbar,#sk-lb,#sk-op,#sk-ex,.sk-bg');};
+  function gSel(el){
+    if(el.id)return '#'+el.id;
+    var path=[],cur=el,depth=0;
+    while(cur&&cur!==document.body&&depth<5){
+      if(cur.id){path.unshift('#'+cur.id);break;}
+      var seg=cur.tagName.toLowerCase();
+      if(cur.className&&typeof cur.className==='string'){var cls=cur.className.trim().split(/\s+/).filter(function(c){return c&&c.indexOf('sk-')!==0;}).join('.');if(cls)seg+='.'+cls;}
+      path.unshift(seg);
+      var sel=path.join(' > ');
+      var m;try{m=document.querySelectorAll(sel);}catch(e){m=[];}
+      if(m.length===1&&m[0]===el)return sel;
+      var par=cur.parentElement;
+      if(par&&par.children.length>1){var idx=Array.prototype.indexOf.call(par.children,cur)+1;path[0]=seg+':nth-child('+idx+')';sel=path.join(' > ');try{m=document.querySelectorAll(sel);}catch(e){m=[];}if(m.length===1&&m[0]===el)return sel;}
+      cur=par;depth++;
+    }
+    return path.join(' > ');
+  }
+  function gSig(el){
+    var tag=el.tagName.toLowerCase();
+    var cls=(el.className&&typeof el.className==='string'&&el.className.trim())?' class="'+el.className.trim().split(/\s+/).filter(function(c){return c&&c.indexOf('sk-')!==0;}).slice(0,2).join(' ')+'"':'';
+    var dt='';for(var i=0;i<el.childNodes.length;i++){if(el.childNodes[i].nodeType===3)dt+=el.childNodes[i].textContent;}
+    dt=dt.trim();if(!dt)dt=(el.textContent||'').trim();
+    return '<'+tag+cls+'>'+dt.slice(0,40)+'</'+tag+'>';
+  }
+  document.getElementById('sk-tg').onclick=function(){mode=!mode;this.textContent=mode?'关闭标注':'开启标注';this.classList.toggle('active',mode);document.body.classList.toggle('sk-ann',mode);if(!mode)cH();};
+  document.addEventListener('mousemove',function(e){
+    if(!mode||op.style.display==='block')return;
+    var el=document.elementFromPoint(e.clientX,e.clientY);
+    if(isT(el)||el===document.body){cH();return;}
+    if(el!==hv){cH();el.classList.add('sk-h');hv=el;}
+    var r=el.getBoundingClientRect();
+    lb.innerHTML='&lt;'+el.tagName.toLowerCase()+'&gt; '+Math.round(r.width)+'x'+Math.round(r.height)+' | '+gSel(el);
+    lb.style.display='block';
+    lb.style.left=Math.min(e.clientX+14,window.innerWidth-400)+'px';
+    lb.style.top=(e.clientY+14)+'px';
+  });
+  function cH(){if(hv){hv.classList.remove('sk-h');hv=null;}lb.style.display='none';}
+  document.addEventListener('click',function(e){
+    if(!mode)return;
+    var el=document.elementFromPoint(e.clientX,e.clientY);
+    if(isT(el)||el===document.body)return;
+    e.preventDefault();e.stopPropagation();
+    pe=el;
+    var sel=gSel(el);
+    document.getElementById('sk-os').textContent='selector: '+sel;
+    document.getElementById('sk-ot').textContent='元素：'+gSig(el);
+    document.getElementById('sk-oi').value='';
+    op.style.display='block';
+    var r=el.getBoundingClientRect();
+    var l=r.right+8,t=r.top;
+    if(l+300>window.innerWidth)l=Math.max(8,r.left-310);
+    if(t+160>window.innerHeight-10)t=window.innerHeight-170;
+    op.style.left=l+'px';op.style.top=t+'px';
+    document.getElementById('sk-oi').focus();
+  },{capture:true});
+  function cOp(){
+    var ch=document.getElementById('sk-oi').value.trim();
+    if(!ch||!pe){op.style.display='none';pe=null;return;}
+    var sel=gSel(pe),sig=gSig(pe);
+    bg++;ans.push({i:bg,sel:sel,sig:sig,ch:ch});
+    pe.classList.add('sk-d');
+    if(getComputedStyle(pe).position==='static')pe.style.position='relative';
+    var b=document.createElement('span');b.className='sk-bg';b.textContent=bg;pe.appendChild(b);
+    op.style.display='none';pe=null;
+    document.getElementById('sk-ct').textContent='已标 '+ans.length;
+  }
+  document.getElementById('sk-ok').onclick=cOp;
+  document.getElementById('sk-oi').addEventListener('keydown',function(e){if(e.key==='Enter'&&(e.ctrlKey||e.metaKey))cOp();});
+  document.getElementById('sk-oc').onclick=function(){op.style.display='none';pe=null;};
+  document.getElementById('sk-exb').onclick=function(){
+    var pre=document.getElementById('sk-ep');
+    if(!ans.length){pre.textContent='（还没有标注。开启标注，点元素写改动试试）';}
+    else{pre.textContent=ans.map(function(a){return a.i+'. '+a.sel+' | '+a.sig+' | '+a.ch;}).join('\n');}
+    ex.style.display='block';
+  };
+  document.getElementById('sk-cp').onclick=function(){
+    var t=document.getElementById('sk-ep').textContent;
+    navigator.clipboard.writeText(t).then(function(){var b=document.getElementById('sk-cp');b.textContent='已复制';setTimeout(function(){b.textContent='复制';},1200);});
+  };
+  document.getElementById('sk-cl').onclick=function(){
+    ans=[];bg=0;
+    document.querySelectorAll('.sk-bg').forEach(function(b){b.remove();});
+    document.querySelectorAll('.sk-d').forEach(function(e){e.classList.remove('sk-d');});
+    ex.style.display='none';
+    document.getElementById('sk-ct').textContent='已标 0';
+  };
+})();
+</script>
+
+<script>
+// 标注器源码：bmUrl = 书签用（javascript: 编码）；src = 控制台用（纯 JS 原文）
+var src = document.getElementById('annotator-src').textContent.trim();
+var bmUrl = 'javascript:' + encodeURIComponent(src);
+document.getElementById('bookmark-link').href = bmUrl;
+
+// 通用复制：优先 clipboard API，失败（file:// 等非安全上下文）用 execCommand 兜底
+function copyText(text, ok, fail){
+  function fallback(){
+    var ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); ok(); } catch(e){ fail(); }
+    document.body.removeChild(ta);
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(ok, fallback);
+  } else { fallback(); }
+}
+
+// 复制书签代码（javascript: URL）：Chrome 拖拽 / Edge 先建再改用
+document.getElementById('copy-code').onclick = function(){
+  var btn = this, origin = '📋 复制书签代码（javascript:）';
+  copyText(bmUrl,
+    function(){ btn.textContent = '✅ 已复制 → Chrome 拖拽；Edge 见说明③先建再改'; setTimeout(function(){ btn.textContent = origin; }, 3000); },
+    function(){ btn.textContent = '❌ 复制失败，请右键蓝色按钮复制链接'; setTimeout(function(){ btn.textContent = origin; }, 3000); }
+  );
+};
+
+// 复制控制台源码（纯 JS）：Edge 推荐法用，粘进 F12 Console 回车
+document.getElementById('copy-console').onclick = function(){
+  var btn = this, origin = '📋 复制控制台源码（Edge 推荐）';
+  copyText(src,
+    function(){ btn.textContent = '✅ 已复制源码 → F12 → Console → 粘贴回车'; setTimeout(function(){ btn.textContent = origin; }, 3000); },
+    function(){ btn.textContent = '❌ 复制失败，请重试或改用书签法'; setTimeout(function(){ btn.textContent = origin; }, 3000); }
+  );
+};
+</script>
+
+</body>
+</html>
