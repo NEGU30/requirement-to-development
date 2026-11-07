@@ -16,3 +16,7 @@ desktop.ini
 
 # Local-only history (not published)
 *.internal.md
+
+# Generated plugin build
+dist/
+node_modules/

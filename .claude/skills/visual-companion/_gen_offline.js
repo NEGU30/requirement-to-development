@@ -1,8 +1,39 @@
 /**
- * 离线化生成脚本 v2：只生成 HTML 中实际用到的 Tailwind 类
+ * 离线化生成脚本 v3：扫描 HTML 实际用到的 Tailwind 类，生成精简离线 CSS。
+ *
+ * 用法：
+ *   node _gen_offline.js <input.html> [output.css]
+ *   node _gen_offline.js <input.html> --stdout
+ *
+ * 未指定输出时，写到输入文件旁的 <name>.offline.css。
  */
 const fs = require('fs');
-const html = fs.readFileSync('AI开发流程设计分享_示例.html', 'utf8');
+const path = require('path');
+
+const args = process.argv.slice(2);
+if (!args.length || args.includes('--help') || args.includes('-h')) {
+  console.error('Usage: node _gen_offline.js <input.html> [output.css] [--stdout]');
+  process.exit(args.length ? 0 : 1);
+}
+
+const inputPath = path.resolve(args[0]);
+const stdout = args.includes('--stdout');
+const outputArg = args.slice(1).find((arg) => !arg.startsWith('--'));
+const outputPath = stdout
+  ? null
+  : outputArg
+    ? path.resolve(outputArg)
+    : path.join(
+        path.dirname(inputPath),
+        path.basename(inputPath, path.extname(inputPath)) + '.offline.css'
+      );
+
+if (!fs.existsSync(inputPath)) {
+  console.error(`Input HTML not found: ${inputPath}`);
+  process.exit(1);
+}
+
+const html = fs.readFileSync(inputPath, 'utf8');
 
 // 提取所有 class 属性中的类名
 const usedClasses = new Set();
@@ -257,5 +288,10 @@ if (usedClasses.has('lg:hidden')) out += '@media(min-width:1024px){.lg\\:hidden{
 if (usedClasses.has('lg:px-10')) out += '@media(min-width:1024px){.lg\\:px-10{padding-left:2.5rem;padding-right:2.5rem}}\n';
 if (usedClasses.has('xl:grid-cols-[0.8fr_1.2fr]')) out += '@media(min-width:1280px){.xl\\:grid-cols-\\[0\\.8fr_1\\.2fr\\]{grid-template-columns:0.8fr 1.2fr}}\n';
 
-fs.writeFileSync('_offline_tailwind.css', out);
-console.log('Generated CSS:', out.length, 'bytes,', out.split('\n').length, 'lines');
+if (stdout) {
+  process.stdout.write(out);
+} else {
+  fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+  fs.writeFileSync(outputPath, out);
+  console.error(`Generated CSS: ${outputPath} (${out.length} bytes, ${out.split('\n').length} lines)`);
+}

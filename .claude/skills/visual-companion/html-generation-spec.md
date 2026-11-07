@@ -342,7 +342,7 @@ font-family: -apple-system, "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-s
 ## 历史可视化 HTML 的离线化（可选兜底）
 
 若历史 HTML 用了 Tailwind/Mermaid CDN，想离线化：
-- Tailwind：可用同目录 `skills/visual-companion/_gen_offline.js`（Node 脚本）扫描用到的 class 生成精简离线 CSS 内联
+- Tailwind：`node .claude/skills/visual-companion/_gen_offline.js <input.html> [output.css]`（默认输出到 HTML 同目录 `<name>.offline.css`；`--stdout` 直接输出）扫描实际用到的 class 生成精简离线 CSS，再把内容内联进 HTML
 - Mermaid：建议改为内联 SVG（按本规范重画图表）
 
 但**新生成的 HTML 必须按上述规范直接自包含**（内联 CSS + 内联 SVG），不走后处理。

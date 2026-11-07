@@ -1,0 +1,17 @@
+{
+  "name": "requirement-to-development",
+  "version": "1.0.0",
+  "private": true,
+  "description": "需求推演至开发：Claude Code 需求流程插件/模板",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "check": "node --test tests/*.test.js",
+    "build:plugin": "node scripts/build-plugin.js",
+    "install:project": "node scripts/install.js",
+    "sync:check": "node scripts/sync-check.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "UNLICENSED"
+}

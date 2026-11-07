@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "paths": {
+    "workspace": "个人",
+    "team": "team",
+    "artifacts": {
+      "analysis": "RequirementAnalysis",
+      "design": "DesignDecisions",
+      "visual": "VisualMockups",
+      "prd": "PRD",
+      "review": "ReviewLogs",
+      "logs": "RequirementLogs",
+      "retro": "Retrospectives"
+    }
+  },
+  "stages": [
+    { "key": "analysis", "index": 0, "label": "需求分析" },
+    { "key": "brainstorming", "index": 1, "label": "需求推演" },
+    { "key": "visual", "index": 2, "label": "需求可视化" },
+    { "key": "prd", "index": 3, "label": "PRD 生成" },
+    { "key": "review", "index": 4, "label": "需求评审" },
+    { "key": "retro", "index": 5, "label": "需求复盘" },
+    { "key": "finalized", "index": 6, "label": "已定稿" }
+  ],
+  "review": {
+    "fullReviewers": 5,
+    "incrementalReviewers": 5,
+    "lightReviewers": 3
+  },
+  "prd": {
+    "minChars": 1500,
+    "maxChars": 5000,
+    "requiredSections": [
+      "需求与产品概述",
+      "设计方案与取舍",
+      "假设的反馈与风险",
+      "功能设计与分期规划",
+      "跨端交互差异",
+      "更新记录"
+    ]
+  }
+}

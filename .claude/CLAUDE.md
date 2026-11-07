@@ -21,11 +21,38 @@
 - AI 不得以"改动小""不影响逻辑""不涉及架构"等理由自行跳过强制步骤。
 - 跳步的唯一合法来源是**用户明确授权**。
 
+## 状态记录（每阶段必做）
+
+流程启动时初始化，阶段推进 / 回流 / 定稿时更新：
+
+```bash
+node "${CLAUDE_PLUGIN_ROOT:-.claude}/scripts/reqflow-state.js init --root "个人/{作者}/{模块}/[功能名]" --author "{作者}" --module "{模块}" --feature "[功能名]" --flow A|B
+node "${CLAUDE_PLUGIN_ROOT:-.claude}/scripts/reqflow-state.js set  --root "个人/{作者}/{模块}/[功能名]" --stage 2 --note "可视化通过"
+node "${CLAUDE_PLUGIN_ROOT:-.claude}/scripts/reqflow-state.js reopen --root "个人/{作者}/{模块}/[功能名]" --reason "评审回流"
+```
+
+`state.json` 是 hooks 判断当前阶段的唯一机器输入；流程日志是给人看的叙述记录。两者都要维护。
+
 ## 评审后修改必须回流
 
-阶段4 评审后的任何 PRD 修改，必须**回到阶段1**重新走完整链路，**不允许**在评审环节或直接编辑 PRD 文件。
+阶段4 评审后的任何**语义修改**，必须**回到阶段1**重新走完整链路，**不允许**在评审环节或直接编辑 PRD 文件。
+
+**勘误快线（唯一例外）**：仅限错别字、标点、格式、链接、文件名笔误，且**不改变任何语义、FID、优先级、取舍**。必须同时满足：
+
+- 用户明确授权（AI 不得自行判定为勘误）
+- 修改前在 `RequirementLogs/` 流程日志记录：改了什么、为什么属于勘误
+- 若改动涉及需求内容、边界、优先级、交互、假设或风险 → 立即退出快线，回阶段1
+
+## 评审强度分级（防过度评审）
+
+- **L1 全量**（默认）：首轮 PRD、跨模块需求、P0 核心流程 → 5 位评审专家全量并行。
+- **L2 增量**：评审回流后的第 2 轮及以后 → 5 位专家仍参与，但只审 `diff + 受影响章节 + 回归影响`，不重读未变章节。评审日志必须列出本轮 diff 范围与已通过基线。
+- **L3 轻量**：仅格式/文案/单 FID 局部改动，且用户明确授权 → 可缩为 3 位（完整性与逻辑 / 需求风险 / 格式与文风）。授权与理由写入评审日志。
+- 任何降档都**不是跳步**：闸门、用户确认、回流决策不变。AI 不得自行降档。
 
 ## 方案目录约定（协作结构 · 本项目适配）
+
+> **机器可读唯一事实源**：`.claude/reqflow/config.json`（workspace 名、产物子目录、阶段、评审人数、PRD 字数闸门）。本节是给人和 AI 阅读的镜像；改路径时必须同步 config、本节、`.claude/hooks/hooks-guide.md` 与 `team/conventions/路径与阶段约定.md`。
 
 本项目的需求产物采用「个人工作区 + 团队共享区」双层协作结构，**不使用默认的 `docs/<产物类型>/[功能]/` 平铺路径**：
 
@@ -33,7 +60,8 @@
   - `{作者}` = 当前策划人员标识，命名标准为**「中文名-工号」**（如 `张三-1001`），由 `requirement-pipeline` 在流程启动时确认
   - `{模块}` = 七大模块之一（见 `team/conventions/模块清单.md`），**可选**；不归属具体模块时用 `_通用` 兜底。禁止自创模块名
   - `[功能名]` = 本次需求的功能名
-- **六类产物**分别落到方案根下对应子目录（RequirementAnalysis / VisualMockups / PRD / ReviewLogs / RequirementLogs / Retrospectives）
+- **七类产物**分别落到方案根下对应子目录（RequirementAnalysis / DesignDecisions / VisualMockups / PRD / ReviewLogs / RequirementLogs / Retrospectives）
+- **流程状态**统一写到 `RequirementLogs/state.json`，由 hooks 读取；流程日志仍写人类可读的 `[序号]_[功能名]_流程记录.md`
 - **项目背景**统一在 `team/project-context/`
 - **定稿归档**：评审通过 + **人工审批**后，整个 `[功能名]/` 目录复制到 `team/finalized-proposals/{模块}/[YYYYMMDD_功能名_作者]/`。归档是 **本流程之外的独立动作**，必须经人工审批，不自动触发、不在本流程内执行
 
@@ -46,10 +74,11 @@
 | 产物 | 路径 |
 |------|------|
 | 需求论证 | `个人/{作者}/{模块}/[功能名]/RequirementAnalysis/` |
+| 设计决策（阶段 1） | `个人/{作者}/{模块}/[功能名]/DesignDecisions/设计决策_[功能名].md` |
 | 可视化 HTML | `个人/{作者}/{模块}/[功能名]/VisualMockups/` |
 | 需求文档 PRD | `个人/{作者}/{模块}/[功能名]/PRD/` |
 | 评审记录 | `个人/{作者}/{模块}/[功能名]/ReviewLogs/` |
-| 流程日志 + 定稿标记 | `个人/{作者}/{模块}/[功能名]/RequirementLogs/` |
+| 流程日志 + state.json + 定稿标记 | `个人/{作者}/{模块}/[功能名]/RequirementLogs/` |
 | 复盘总结 | `个人/{作者}/{模块}/[功能名]/Retrospectives/` |
 | 项目背景（共享只读） | `team/project-context/` |
 
@@ -57,9 +86,10 @@
 
 本项目配置了流程守护 hooks（安装步骤见 `hooks/hooks-guide.md`）：
 
-- **SessionStart**：每会话注入流程框架摘要，AI 全会话了解流程（"强制看内容"）
-- **UserPromptSubmit**：有活跃流程时注入当前阶段，防长会话失忆
-- **PreToolUse**：写需求产物前，提醒前置阶段是否完成（提醒模式，不阻断）
+- **SessionStart**：每会话注入精简流程摘要，AI 全会话了解入口与硬规则
+- **UserPromptSubmit**：有活跃流程时读取 `RequirementLogs/state.json` 注入当前阶段，防长会话失忆
+- **PreToolUse**：写可视化 / PRD 前，检查前置阶段产物是否**真实存在且非空**（提醒模式，不阻断）
+- **PostToolUse**：写产物后自动检查字数、章节、FID、占位符；HTML 每次修改后重新提醒 UI 规范审查
 
 hooks 是辅助可见性，**流程纪律的最终保证仍靠本文件 + skill 软约束 + 用户把关**。
 

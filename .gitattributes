@@ -18,3 +18,7 @@
 *.woff binary
 *.woff2 binary
 *.ttf binary
+
+# Node scripts LF
+*.js text eol=lf
+*.json text eol=lf
